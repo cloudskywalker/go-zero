@@ -20,7 +20,7 @@ const (
 
 var cpuUsage int64
 
-func init() {
+func Init() {
 	go func() {
 		cpuTicker := time.NewTicker(cpuRefreshInterval)
 		defer cpuTicker.Stop()
