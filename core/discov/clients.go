@@ -39,3 +39,7 @@ func extractId(etcdKey string) (string, bool) {
 func makeEtcdKey(key string, id int64) string {
 	return fmt.Sprintf("%s%c%d", key, internal.Delimiter, id)
 }
+
+func MarkEtcdClientStandalone() {
+	internal.NewClient = internal.DialClientStandalone
+}

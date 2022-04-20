@@ -312,6 +312,18 @@ func DialClient(endpoints []string) (EtcdClient, error) {
 	})
 }
 
+// DialClientStandalone dials an standalone etcd with given endpoionts.
+func DialClientStandalone(endpoints []string) (EtcdClient, error) {
+	return clientv3.New(clientv3.Config{
+		Endpoints:            endpoints,
+		//AutoSyncInterval:     autoSyncInterval,
+		DialTimeout:          DialTimeout,
+		DialKeepAliveTime:    dialKeepAliveTime,
+		DialKeepAliveTimeout: DialTimeout,
+		//RejectOldCluster:     true,
+	})
+}
+
 func getClusterKey(endpoints []string) string {
 	sort.Strings(endpoints)
 	return strings.Join(endpoints, endpointsSeparator)
