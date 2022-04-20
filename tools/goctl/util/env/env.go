@@ -7,15 +7,15 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/tal-tech/go-zero/tools/goctl/vars"
+	"github.com/zeromicro/go-zero/tools/goctl/vars"
 )
 
 const (
-	bin               = "bin"
-	binGo             = "go"
-	binProtoc         = "protoc"
-	binProtocGenGo    = "protoc-gen-go"
-	binProtocGenGoctl = "protoc-gen-goctl"
+	bin                = "bin"
+	binGo              = "go"
+	binProtoc          = "protoc"
+	binProtocGenGo     = "protoc-gen-go"
+	binProtocGenGrpcGo = "protoc-gen-go-grpc"
 )
 
 // LookUpGo searches an executable go in the directories
@@ -39,20 +39,20 @@ func LookUpProtoc() (string, error) {
 	return LookPath(xProtoc)
 }
 
-// Deprecated: LookUpProtocGenGo searches an executable protoc-gen-go in the directories
-// named by the PATH environment variable, use LookUpProtocGenGoctl instead.
+// LookUpProtocGenGo searches an executable protoc-gen-go in the directories
+// named by the PATH environment variable.
 func LookUpProtocGenGo() (string, error) {
 	suffix := getExeSuffix()
 	xProtocGenGo := binProtocGenGo + suffix
 	return LookPath(xProtocGenGo)
 }
 
-// LookUpProtocGenGoctl searches an executable protoc-gen-go in the directories
+// LookUpProtocGenGoGrpc searches an executable protoc-gen-go-grpc in the directories
 // named by the PATH environment variable.
-func LookUpProtocGenGoctl() (string, error) {
+func LookUpProtocGenGoGrpc() (string, error) {
 	suffix := getExeSuffix()
-	xProtocGenGo := binProtocGenGoctl + suffix
-	return LookPath(xProtocGenGo)
+	xProtocGenGoGrpc := binProtocGenGrpcGo + suffix
+	return LookPath(xProtocGenGoGrpc)
 }
 
 // LookPath searches for an executable named file in the

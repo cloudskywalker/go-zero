@@ -51,6 +51,10 @@ func TestTraceError(t *testing.T) {
 	l.WithDuration(time.Second).Errorf(testlog)
 	assert.True(t, strings.Contains(buf.String(), traceKey))
 	assert.True(t, strings.Contains(buf.String(), spanKey))
+	buf.Reset()
+	l.WithDuration(time.Second).Errorv(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceKey))
+	assert.True(t, strings.Contains(buf.String(), spanKey))
 }
 
 func TestTraceInfo(t *testing.T) {
@@ -72,6 +76,41 @@ func TestTraceInfo(t *testing.T) {
 	l.WithDuration(time.Second).Infof(testlog)
 	assert.True(t, strings.Contains(buf.String(), traceKey))
 	assert.True(t, strings.Contains(buf.String(), spanKey))
+	buf.Reset()
+	l.WithDuration(time.Second).Infov(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceKey))
+	assert.True(t, strings.Contains(buf.String(), spanKey))
+}
+
+func TestTraceInfoConsole(t *testing.T) {
+	old := atomic.LoadUint32(&encoding)
+	atomic.StoreUint32(&encoding, jsonEncodingType)
+	defer func() {
+		atomic.StoreUint32(&encoding, old)
+	}()
+
+	var buf mockWriter
+	atomic.StoreUint32(&initialized, 1)
+	infoLog = newLogWriter(log.New(&buf, "", flags))
+	otp := otel.GetTracerProvider()
+	tp := sdktrace.NewTracerProvider(sdktrace.WithSampler(sdktrace.AlwaysSample()))
+	otel.SetTracerProvider(tp)
+	defer otel.SetTracerProvider(otp)
+
+	ctx, _ := tp.Tracer("foo").Start(context.Background(), "bar")
+	l := WithContext(ctx).(*traceLogger)
+	SetLevel(InfoLevel)
+	l.WithDuration(time.Second).Info(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceIdFromContext(ctx)))
+	assert.True(t, strings.Contains(buf.String(), spanIdFromContext(ctx)))
+	buf.Reset()
+	l.WithDuration(time.Second).Infof(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceIdFromContext(ctx)))
+	assert.True(t, strings.Contains(buf.String(), spanIdFromContext(ctx)))
+	buf.Reset()
+	l.WithDuration(time.Second).Infov(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceIdFromContext(ctx)))
+	assert.True(t, strings.Contains(buf.String(), spanIdFromContext(ctx)))
 }
 
 func TestTraceSlow(t *testing.T) {
@@ -91,6 +130,10 @@ func TestTraceSlow(t *testing.T) {
 	assert.True(t, strings.Contains(buf.String(), spanKey))
 	buf.Reset()
 	l.WithDuration(time.Second).Slowf(testlog)
+	assert.True(t, strings.Contains(buf.String(), traceKey))
+	assert.True(t, strings.Contains(buf.String(), spanKey))
+	buf.Reset()
+	l.WithDuration(time.Second).Slowv(testlog)
 	assert.True(t, strings.Contains(buf.String(), traceKey))
 	assert.True(t, strings.Contains(buf.String(), spanKey))
 }

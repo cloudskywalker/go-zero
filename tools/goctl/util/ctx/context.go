@@ -2,9 +2,10 @@ package ctx
 
 import (
 	"errors"
+	"fmt"
 	"path/filepath"
 
-	"github.com/tal-tech/go-zero/tools/goctl/rpc/execx"
+	"github.com/zeromicro/go-zero/tools/goctl/rpc/execx"
 )
 
 var errModuleCheck = errors.New("the work directory must be found in the go mod or the $GOPATH")
@@ -17,7 +18,7 @@ type ProjectContext struct {
 	// eg: go-zero、greet
 	Name string
 	// Path identifies which module a project belongs to, which is module value if it's a go mod project,
-	// or else it is the root name of the project, eg: github.com/tal-tech/go-zero、greet
+	// or else it is the root name of the project, eg: github.com/zeromicro/go-zero、greet
 	Path string
 	// Dir is the path of the project, eg: /Users/keson/goland/go/go-zero、/Users/keson/go/src/greet
 	Dir string
@@ -31,6 +32,7 @@ func Prepare(workDir string) (*ProjectContext, error) {
 	if err == nil {
 		return ctx, nil
 	}
+	fmt.Printf("get project context from workdir[%s] failed: %s\n", workDir, err)
 
 	name := filepath.Base(workDir)
 	_, err = execx.Run("go mod init "+name, workDir)

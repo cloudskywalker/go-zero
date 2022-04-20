@@ -3,9 +3,10 @@ package logx
 import (
 	"fmt"
 	"io"
+	"sync/atomic"
 	"time"
 
-	"github.com/tal-tech/go-zero/core/timex"
+	"github.com/zeromicro/go-zero/core/timex"
 )
 
 const durationCallerDepth = 3
@@ -79,8 +80,15 @@ func (l *durationLogger) WithDuration(duration time.Duration) Logger {
 }
 
 func (l *durationLogger) write(writer io.Writer, level string, val interface{}) {
-	l.Timestamp = getTimestamp()
-	l.Level = level
-	l.Content = val
-	outputJson(writer, l)
+	switch atomic.LoadUint32(&encoding) {
+	case plainEncodingType:
+		writePlainAny(writer, level, val, l.Duration)
+	default:
+		outputJson(writer, &durationLogger{
+			Timestamp: getTimestamp(),
+			Level:     level,
+			Content:   val,
+			Duration:  l.Duration,
+		})
+	}
 }

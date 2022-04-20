@@ -2,6 +2,8 @@
 
 # go-zero
 
+***缩短从需求到上线的距离***
+
 [English](readme.md) | 简体中文
 
 [![Go](https://github.com/zeromicro/go-zero/workflows/Go/badge.svg?branch=master)](https://github.com/zeromicro/go-zero/actions)
@@ -11,7 +13,13 @@
 [![Release](https://img.shields.io/github/v/release/zeromicro/go-zero.svg?style=flat-square)](https://github.com/zeromicro/go-zero)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**注意：为了满足开源基金会要求，go-zero 从好未来（tal-tech）组织下迁移至中立的 GitHub 组织（zeromicro）。**
+> ***注意：***
+>
+> 从 v1.3.0 之前版本升级请执行以下命令：
+> 
+> `GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest`
+> 
+> `goctl migrate —verbose —version v1.3.2`
 
 ## 0. go-zero 介绍
 
@@ -87,7 +95,7 @@ go-zero 是一个集成了各种工程实践的包含 web 和 rpc 框架，有�
 在项目目录下通过如下命令安装：
 
 ```shell
-GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/go-zero
+GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro/go-zero
 ```
 
 ## 5. Quick Start
@@ -104,10 +112,20 @@ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/
 
     ```shell
     # Go 1.15 及之前版本
-    GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/go-zero/tools/goctl
+    GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro/go-zero/tools/goctl@latest
     
     # Go 1.16 及以后版本
-    go install github.com/tal-tech/go-zero/tools/goctl@latest
+    GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest
+
+    # docker for amd64 architecture
+    docker pull kevinwan/goctl
+    # run goctl like
+    docker run --rm -it -v `pwd`:/app kevinwan/goctl goctl --help
+
+    # docker for arm64 (M1) architecture
+    docker pull kevinwan/goctl:latest-arm64
+    # run goctl like
+    docker run --rm -it -v `pwd`:/app kevinwan/goctl:latest-arm64 goctl --help
     ```
 
     确保 goctl 可执行
@@ -141,7 +159,7 @@ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/
 
     编写业务代码：
 
-      * api 文件定义了服务对外 HTTP 接口，可参考 [api 规范](https://github.com/zeromicro/zero-doc/blob/main/doc/goctl.md)
+      * api 文件定义了服务对外 HTTP 接口，可参考 [api 规范](https://github.com/zeromicro/zero-doc/blob/main/docs/zero/goctl-api.md)
       * 可以在 `servicecontext.go` 里面传递依赖给 logic，比如 mysql, redis 等
       * 在 api 定义的 `get/post/put/delete` 等请求对应的 logic 里增加业务处理逻辑
 
@@ -229,6 +247,21 @@ go-zero 已被许多公司用于生产部署，接入场景如在线教育、电
 >43. 济南超级盟网络科技有限公司
 >44. 苏州互盟信息存储技术有限公司
 >45. 成都艾途教育科技集团有限公司
+>46. 上海游族网络
+>47. 深信服
+>48. 中免日上科技互联有限公司
+>49. ECLOUDVALLEY TECHNOLOGY (HK) LIMITED
+>50. 馨科智（深圳）科技有限公司
+>51. 成都松珀科技有限公司
+>52. 亿景智联
+>53. 上海扩博智能技术有限公司
+>54. 一犀科技成都有限公司
+>55. 北京术杰科技有限公司
+>56. 时代脉搏网络科技（云浮市）有限公司
+>57. 店有帮
+>58. 七牛云
+>59. 费芮网络
+>60. 51CTO
 
 如果贵公司也已使用 go-zero，欢迎在 [登记地址](https://github.com/zeromicro/go-zero/issues/602) 登记，仅仅为了推广，不做其它用途。
 
@@ -245,7 +278,7 @@ go-zero 收录在 [CNCF Cloud Native 云原生技术全景图](https://landscape
 
 `go-zero` 相关文章和视频都会在 `微服务实践` 公众号整理呈现，欢迎扫码关注 👏
 
-<img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/wechat-micro.jpg" alt="wechat" width="300" />
+<img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/zeromicro.jpg" alt="wechat" width="600" />
 
 ## 11. 微信交流群
 
@@ -258,3 +291,9 @@ go-zero 收录在 [CNCF Cloud Native 云原生技术全景图](https://landscape
 加群之前有劳点一下 ***star***，一个小小的 ***star*** 是作者们回答海量问题的动力！🤝
 
 <img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/wechat.jpg" alt="wechat" width="300" />
+
+## 12. 赞助一下👍
+
+如果觉得项目有帮助，可以请作者喝杯咖啡 🍹
+
+<img src="https://raw.githubusercontent.com/zeromicro/zero-doc/main/doc/images/sponsor.png" alt="wechat" width="300" />

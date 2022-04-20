@@ -1,68 +1,59 @@
 package apigen
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
+	"html/template"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"github.com/logrusorgru/aurora"
-	"github.com/tal-tech/go-zero/tools/goctl/util"
 	"github.com/urfave/cli"
+	"github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
-const apiTemplate = `
-syntax = "v1"
-
-info(
-	title: // TODO: add title
-	desc: // TODO: add description
-	author: "{{.gitUser}}"
-	email: "{{.gitEmail}}"
-)
-
-type request {
-	// TODO: add members here and delete this comment
-}
-
-type response {
-	// TODO: add members here and delete this comment
-}
-
-service {{.serviceName}} {
-	@handler GetUser // TODO: set handler name and delete this comment
-	get /users/id/:userId(request) returns(response)
-
-	@handler CreateUser // TODO: set handler name and delete this comment
-	post /users/create(request)
-}
-`
+//go:embed api.tpl
+var apiTemplate string
 
 // ApiCommand create api template file
 func ApiCommand(c *cli.Context) error {
+	if c.NumFlags() == 0 {
+		cli.ShowAppHelpAndExit(c, 1)
+	}
+
 	apiFile := c.String("o")
 	if len(apiFile) == 0 {
 		return errors.New("missing -o")
 	}
 
-	fp, err := util.CreateIfNotExist(apiFile)
+	fp, err := pathx.CreateIfNotExist(apiFile)
 	if err != nil {
 		return err
 	}
 	defer fp.Close()
 
 	home := c.String("home")
-	if len(home) > 0 {
-		util.RegisterGoctlHome(home)
+	remote := c.String("remote")
+	branch := c.String("branch")
+	if len(remote) > 0 {
+		repo, _ := util.CloneIntoGitHome(remote, branch)
+		if len(repo) > 0 {
+			home = repo
+		}
 	}
 
-	text, err := util.LoadTemplate(category, apiTemplateFile, apiTemplate)
+	if len(home) > 0 {
+		pathx.RegisterGoctlHome(home)
+	}
+
+	text, err := pathx.LoadTemplate(category, apiTemplateFile, apiTemplate)
 	if err != nil {
 		return err
 	}
 
-	baseName := util.FileNameWithoutExt(filepath.Base(apiFile))
+	baseName := pathx.FileNameWithoutExt(filepath.Base(apiFile))
 	if strings.HasSuffix(strings.ToLower(baseName), "-api") {
 		baseName = baseName[:len(baseName)-4]
 	} else if strings.HasSuffix(strings.ToLower(baseName), "api") {

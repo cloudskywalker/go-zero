@@ -6,16 +6,18 @@ import (
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/tal-tech/go-zero/core/logx"
-	"github.com/tal-tech/go-zero/core/stores/postgres"
-	"github.com/tal-tech/go-zero/core/stores/sqlx"
-	"github.com/tal-tech/go-zero/tools/goctl/config"
-	"github.com/tal-tech/go-zero/tools/goctl/model/sql/gen"
-	"github.com/tal-tech/go-zero/tools/goctl/model/sql/model"
-	"github.com/tal-tech/go-zero/tools/goctl/model/sql/util"
-	file "github.com/tal-tech/go-zero/tools/goctl/util"
-	"github.com/tal-tech/go-zero/tools/goctl/util/console"
 	"github.com/urfave/cli"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/postgres"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/tools/goctl/config"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/command/migrationnotes"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/gen"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/model"
+	"github.com/zeromicro/go-zero/tools/goctl/model/sql/util"
+	file "github.com/zeromicro/go-zero/tools/goctl/util"
+	"github.com/zeromicro/go-zero/tools/goctl/util/console"
+	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 
 const (
@@ -29,12 +31,15 @@ const (
 	flagDatabase = "database"
 	flagSchema   = "schema"
 	flagHome     = "home"
+	flagRemote   = "remote"
+	flagBranch   = "branch"
 )
 
 var errNotMatched = errors.New("sql not matched")
 
 // MysqlDDL generates model code from ddl
 func MysqlDDL(ctx *cli.Context) error {
+	migrationnotes.BeforeCommands(ctx)
 	src := ctx.String(flagSrc)
 	dir := ctx.String(flagDir)
 	cache := ctx.Bool(flagCache)
@@ -42,9 +47,16 @@ func MysqlDDL(ctx *cli.Context) error {
 	style := ctx.String(flagStyle)
 	database := ctx.String(flagDatabase)
 	home := ctx.String(flagHome)
-
+	remote := ctx.String(flagRemote)
+	branch := ctx.String(flagBranch)
+	if len(remote) > 0 {
+		repo, _ := file.CloneIntoGitHome(remote, branch)
+		if len(repo) > 0 {
+			home = repo
+		}
+	}
 	if len(home) > 0 {
-		file.RegisterGoctlHome(home)
+		pathx.RegisterGoctlHome(home)
 	}
 	cfg, err := config.NewConfig(style)
 	if err != nil {
@@ -56,15 +68,23 @@ func MysqlDDL(ctx *cli.Context) error {
 
 // MySqlDataSource generates model code from datasource
 func MySqlDataSource(ctx *cli.Context) error {
+	migrationnotes.BeforeCommands(ctx)
 	url := strings.TrimSpace(ctx.String(flagURL))
 	dir := strings.TrimSpace(ctx.String(flagDir))
 	cache := ctx.Bool(flagCache)
 	idea := ctx.Bool(flagIdea)
 	style := ctx.String(flagStyle)
-	home := ctx.String("home")
-
+	home := ctx.String(flagHome)
+	remote := ctx.String(flagRemote)
+	branch := ctx.String(flagBranch)
+	if len(remote) > 0 {
+		repo, _ := file.CloneIntoGitHome(remote, branch)
+		if len(repo) > 0 {
+			home = repo
+		}
+	}
 	if len(home) > 0 {
-		file.RegisterGoctlHome(home)
+		pathx.RegisterGoctlHome(home)
 	}
 
 	pattern := strings.TrimSpace(ctx.String(flagTable))
@@ -78,16 +98,24 @@ func MySqlDataSource(ctx *cli.Context) error {
 
 // PostgreSqlDataSource generates model code from datasource
 func PostgreSqlDataSource(ctx *cli.Context) error {
+	migrationnotes.BeforeCommands(ctx)
 	url := strings.TrimSpace(ctx.String(flagURL))
 	dir := strings.TrimSpace(ctx.String(flagDir))
 	cache := ctx.Bool(flagCache)
 	idea := ctx.Bool(flagIdea)
 	style := ctx.String(flagStyle)
 	schema := ctx.String(flagSchema)
-	home := ctx.String("home")
-
+	home := ctx.String(flagHome)
+	remote := ctx.String(flagRemote)
+	branch := ctx.String(flagBranch)
+	if len(remote) > 0 {
+		repo, _ := file.CloneIntoGitHome(remote, branch)
+		if len(repo) > 0 {
+			home = repo
+		}
+	}
 	if len(home) > 0 {
-		file.RegisterGoctlHome(home)
+		pathx.RegisterGoctlHome(home)
 	}
 
 	if len(schema) == 0 {
