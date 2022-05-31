@@ -1,4 +1,4 @@
-module github.com/zzycn003/go-zero
+module github.com/cloudskywalker/go-zero
 
 go 1.14
 
